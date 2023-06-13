@@ -1,0 +1,88 @@
+const { MongoClient } = require('mongodb');
+
+// Connection URL and database name
+const url = 'mongodb+srv://alexkolev05:1234@eentai.ou01tyv.mongodb.net/?retryWrites=true&w=majority';
+const dbName = 'TaskManager';
+
+// Create a new MongoClient
+const client = new MongoClient(url);
+
+// Connect to the MongoDB server
+async function addTask(task){ 
+    if(task.task_name === null || task.description === null || task.deadline === null || task.completed === null)
+        return false;
+    console.log(task.task_name)
+    const con = await client.connect()
+    console.log('Connected successfully to the MongoDB server');
+    try{
+        const db = client.db(dbName);
+        const collection = db.collection('tasks');
+        
+        collection.insertOne(task);
+    }catch(e){
+        console.log(e)
+        return false;
+    }
+    return true;
+}
+
+async function deleteTask(taskName){
+    const con = await client.connect()
+    console.log('Connected successfully to the MongoDB server');
+    console.log('deleting task')
+    try{
+        const db = client.db(dbName);
+        const collection = db.collection('tasks');
+
+        const query = {task_name: taskName}
+
+        const result = await collection.deleteMany(query)
+        console.log(result.deletedCount)
+    }catch(e){
+        console.log(e)
+        return false;
+    }
+
+    return true;
+}
+
+async function getTask(taskName){
+    const con = await client.connect()
+    console.log('Connected successfully to the MongoDB server');
+    console.log('getting all')
+    try{
+        const db = client.db(dbName);
+        const collection = db.collection('tasks');
+
+        const query = {task_name : taskName}
+
+        const result = await collection.find(query).toArray()
+        return result
+    }catch(e){
+        console.log(e)
+    }  
+}
+
+async function getAllTaskNames(){
+    const con = await client.connect()
+    console.log('Connected successfully to the MongoDB server');
+    console.log('getting all')
+    try{
+        const db = client.db(dbName);
+        const collection = db.collection('tasks');
+
+        const result = await collection.find().toArray()
+        const names = result.forEach(task => {
+            return task.task_name
+        });
+        return names
+    }catch(e){
+        console.log(e)
+    }  
+}
+module.exports = {
+    addTask,
+    deleteTask,
+    getAllTaskNames,
+    getTask
+};
