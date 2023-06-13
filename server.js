@@ -16,13 +16,13 @@ app.get('/home', (req, res) => {
   res.sendFile(filePath);
 });
 
-app.get('/scripts/initial_buttons.js', (req, res) => {
-    const filePath = path.join(__dirname, './public/scripts/buttons.js')
+app.get('/scripts/add_task.js', (req, res) => {
+    const filePath = path.join(__dirname, './public/scripts/add_task.js')
     res.sendFile(filePath)
 })
 
-app.get('/scripts/load_all.js', (req, res) => {
-    const filePath = path.join(__dirname, './public/scripts/buttons.js')
+app.get('/scripts/delete_task.js', (req, res) => {
+    const filePath = path.join(__dirname, './public/scripts/delete_task.js')
     res.sendFile(filePath)
 })
 
@@ -32,7 +32,8 @@ app.get('/all_tasks', (req, res) => {
 
 app.post('/add', (req, res) => {
     const task = req.body;
-    dbFunctions.addTask(req.body)
+    console.log(task)
+    dbFunctions.addTask(task)
     res.send('Received the response!');
   });
 
