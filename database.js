@@ -75,7 +75,7 @@ async function getAllTaskNames(){
             const result = await collection.find({}).toArray()
             let names = []
             result.forEach(taskName => {
-                names.push(taskName.task_name)
+                names.push({task_name : taskName.task_name, status: taskName.status})
             });
             console.log("sending task names from db")
             resolve(names)
@@ -84,6 +84,28 @@ async function getAllTaskNames(){
         }
     })
       
+}
+
+async function updateTaskStatus(taskName){
+    const con = await client.connect()
+    console.log('Connected successfully to the MongoDB server');
+    try{
+        const db = client.db(dbName);
+        const collection = db.collection('tasks');
+    
+        const result = await collection.find({task_name: taskName}).toArray()
+        console.log("WHAT I SEARCHED FOR",taskName)
+        console.log("WHAT I GOT FROM DB", result[0].status)
+        const cur_status = result[0].status
+        const new_status = cur_status === 2 ? 0 : cur_status + 1
+        const filter = { task_name: taskName };
+        const update = { $set: { status: new_status } }; 
+
+        collection.updateOne(filter, update)
+        console.log("sending task names from db")
+        }catch(e){
+            console.log(e)
+    }
 }
 
 async function clear(){
@@ -105,5 +127,6 @@ module.exports = {
     deleteTask,
     getAllTaskNames,
     getTask,
+    updateTaskStatus,
     clear
 };

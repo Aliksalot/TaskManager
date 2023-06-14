@@ -29,11 +29,20 @@ app.get('/scripts/req_task.js', (req, res) => {
   const filePath = path.join(__dirname, './public/scripts/req_task.js')
   res.sendFile(filePath)
 })
+
+app.get('/scripts/show_done.js', (req, res) => {
+  const filePath = path.join(__dirname, './public/scripts/show_done.js')
+  res.sendFile(filePath)
+})
+
+app.get('/scripts/update_status.js', (req, res) => {
+  const filePath = path.join(__dirname, './public/scripts/update_status.js')
+  res.sendFile(filePath)
+})
  
 app.get('/all_tasks', (req, res) => {
   const promise = dbFunctions.getAllTaskNames()
   promise.then(result => {
-    console.log(result)
     res.send(JSON.stringify(result))
   }).catch(err => {
     console.log(err)
@@ -43,15 +52,19 @@ app.get('/all_tasks', (req, res) => {
 
 app.post('/task', (req, res) => {
     const task_name = req.body.task_name
-    console.log(task_name)
     const promise = dbFunctions.getTask(task_name)
     promise.then(result => {
-      console.log(result)
       res.send(JSON.stringify(result))
     }).catch(err => {
       console.log(err)
     })
 
+})
+
+app.post('/update_status', (req, res) => {
+  const taskName = req.body.toUpdate;
+  dbFunctions.updateTaskStatus(taskName)
+  res.send("succesfull status update")
 })
 
 app.post('/add', (req, res) => {

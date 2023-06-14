@@ -35,7 +35,7 @@ const addTask = () => {
             }
         };
         newTaskInputBox.style.display = "none" 
-        const task_obj = {task_name: taskName, description: task_description, deadline: task_deadline}
+        const task_obj = {task_name: taskName, description: task_description, deadline: task_deadline, status: 0}
 
         xhr.send(JSON.stringify(task_obj));
         }
