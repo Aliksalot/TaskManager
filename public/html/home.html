@@ -25,7 +25,7 @@
 		
 	<label for = "inputDescription">Enter Description of the task</label>
 	<input type = "text" id = "inputDescription">
-		s
+		
 	<label for = "inputDeadLine">Enter deadline for the task</label>
 	<input type = "text" id = "inputDeadLine">	
 	
@@ -33,13 +33,17 @@
     
 
     <div id = 'deleteTaskInputBox' style = "display: none">
-    	
+
+        <label for = "inputTaskToDelete">Enter task name</label>
+    	<input type = "text" id = "inputTaskToDelete">
     
     </div>
 
-    <div id = "taskDisplayBox">
+    <h1 id = "taskDisplay">Tasks: </h1>
 
-    </div>
+    <div id = "taskDisplayBox" style = "display: block;" class = 'tasks'>
+        <script src = "./scripts/req_task.js" ></script>
+    </div> 
 
     
     <!--

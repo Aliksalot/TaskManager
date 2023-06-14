@@ -37,13 +37,13 @@ async function deleteTask(taskName){
         const query = {task_name: taskName}
 
         const result = await collection.deleteMany(query)
-        console.log(result.deletedCount)
+        console.log()
+        return result.deletedCount > 0 ? true : false
     }catch(e){
         console.log(e)
         return false;
     }
 
-    return true;
 }
 
 async function getTask(taskName){
@@ -67,22 +67,43 @@ async function getAllTaskNames(){
     const con = await client.connect()
     console.log('Connected successfully to the MongoDB server');
     console.log('getting all')
+    return new Promise(async(resolve, reject) => {
+        try{
+            const db = client.db(dbName);
+            const collection = db.collection('tasks');
+    
+            const result = await collection.find({}).toArray()
+            let names = []
+            result.forEach(taskName => {
+                names.push(taskName.task_name)
+            });
+            console.log("sending task names from db")
+            resolve(names)
+        }catch(e){
+            reject(e)
+        }
+    })
+      
+}
+
+async function clear(){
+    const con = await client.connect()
+    console.log('Connected successfully to the MongoDB server');
+    console.log('getting all')
     try{
         const db = client.db(dbName);
         const collection = db.collection('tasks');
 
-        const result = await collection.find().toArray()
-        const names = result.forEach(task => {
-            return task.task_name
-        });
-        return names
+        const result = await collection.deleteMany();
+        
     }catch(e){
         console.log(e)
-    }  
+    } 
 }
 module.exports = {
     addTask,
     deleteTask,
     getAllTaskNames,
-    getTask
+    getTask,
+    clear
 };
