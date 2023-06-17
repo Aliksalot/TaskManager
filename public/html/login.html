@@ -1,11 +1,28 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
 </head>
 <body>
-    
+  <!-- Your HTML content goes here -->
+	<div style = "white-space: pre-line " >
+
+		<label for = "loginUsername">
+			<script src = "./scripts/send_login_info.js"></script>
+			Username: 
+			<input type = "text" id = "enterLoginUsername" onkeydown="checkSpace(event)">
+			Password:
+			<input type = "password" id = "enterPassword" onkeydown="checkSpace(event)">
+			<button onclick = send_login_info()>Try</button>
+		</label>
+	</div>
+	
+	<div id = "loginFailOutput">
+		
+	</div>
+
+
 </body>
 </html>
+

@@ -24,6 +24,11 @@ app.get('/login', (req, res) => {
     res.sendFile(filePath)
 })
 
+app.get('/scripts/send_login_info.js', (req, res) => {
+    const filePath = path.join(__dirname, './public/scripts/send_login_info.js')
+    res.sendFile(filePath)
+})
+
 app.post('/oJs5Mr1uPxFXVbP2TzWS5SahD', (req, res) =>{
     const {username, password} = req.body
     const promise = dbFunctions.getUser(username)
