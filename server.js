@@ -1,14 +1,46 @@
 const express = require('express');
-const path = require('path')
-const app = express();
-const port = 3000;
 const bodyParser = require('body-parser');
+const session = require('express-session');
+const bcrypt = require('bcrypt');
+const path = require("path")
+const app = express();
+const port = 3000
+const auth = require('./auth.js')
 
+app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 app.use(express.static('public'));
 app.use(express.text())
-
+app.use(session({
+  secret: "I love kids",
+  resave: false,
+  saveUninitialized: false
+}));
+app.use(auth.authenticateUser)
 const dbFunctions =  require('./database.js')
+
+app.get('/login', (req, res) => {
+    const filePath = path.join(__dirname, './public/html/login.html')
+    res.sendFile(filePath)
+})
+
+app.post('/oJs5Mr1uPxFXVbP2TzWS5SahD', (req, res) =>{
+    const {username, password} = req.body
+    const promise = dbFunctions.getUser(username)
+    promise.then(user => {
+      const result = bcrypt.compare(password, user.password)
+      if(result){
+        req.session.user = user
+        res.redirect('/home')
+      }else{
+        res.send("Shet")
+      }
+    }).catch(err => {
+      console.log(err)
+    })
+})
+
+
 
 app.get('/home', (req, res) => {
   const filePath = path.join(__dirname, './public/html/home.html')

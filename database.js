@@ -122,11 +122,29 @@ async function clear(){
         console.log(e)
     } 
 }
+
+async function getUser(username){
+    const con = await client.connect()
+    try{
+        const db = client.db(dbName);
+        const collection = db.collection('users');
+
+        const query = {username : username}
+
+        const result = await collection.findOne(query)
+        return result
+    }catch(e){
+        console.log(e)
+    }  
+}
+
+
 module.exports = {
     addTask,
     deleteTask,
     getAllTaskNames,
     getTask,
     updateTaskStatus,
-    clear
+    clear,
+    getUser
 };
