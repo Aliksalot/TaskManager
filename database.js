@@ -8,9 +8,11 @@ const dbName = 'TaskManager';
 const client = new MongoClient(url);
 
 // Connect to the MongoDB server
-async function addTask(task){ 
+async function addTask(task, user){ 
     if(task.task_name === null || task.description === null || task.deadline === null || task.completed === null)
         return false;
+    task.owner = user.username
+    console.log("TASK OWNER STATUS: ", user.username, task.owner)
     console.log(task.task_name)
     const con = await client.connect()
     console.log('Connected successfully to the MongoDB server');
@@ -26,7 +28,7 @@ async function addTask(task){
     return true;
 }
 
-async function deleteTask(taskName){
+async function deleteTask(taskName, user){
     const con = await client.connect()
     console.log('Connected successfully to the MongoDB server');
     console.log('deleting task')
@@ -34,7 +36,7 @@ async function deleteTask(taskName){
         const db = client.db(dbName);
         const collection = db.collection('tasks');
 
-        const query = {task_name: taskName}
+        const query = {task_name: taskName, owner: user.username}
 
         const result = await collection.deleteMany(query)
         console.log()
@@ -46,7 +48,7 @@ async function deleteTask(taskName){
 
 }
 
-async function getTask(taskName){
+async function getTask(taskName, user){
     const con = await client.connect()
     console.log('Connected successfully to the MongoDB server');
     console.log('getting all')
@@ -54,7 +56,7 @@ async function getTask(taskName){
         const db = client.db(dbName);
         const collection = db.collection('tasks');
 
-        const query = {task_name : taskName}
+        const query = {task_name : taskName, owner: user.username}
 
         const result = await collection.find(query).toArray()
         return result
@@ -63,7 +65,7 @@ async function getTask(taskName){
     }  
 }
 
-async function getAllTaskNames(){
+async function getAllTaskNames(user){
     const con = await client.connect()
     console.log('Connected successfully to the MongoDB server');
     console.log('getting all')
@@ -72,7 +74,7 @@ async function getAllTaskNames(){
             const db = client.db(dbName);
             const collection = db.collection('tasks');
     
-            const result = await collection.find({}).toArray()
+            const result = await collection.find({owner: user.username}).toArray()
             let names = []
             result.forEach(taskName => {
                 names.push({task_name : taskName.task_name, status: taskName.status})
@@ -86,14 +88,14 @@ async function getAllTaskNames(){
       
 }
 
-async function updateTaskStatus(taskName){
+async function updateTaskStatus(taskName, user){
     const con = await client.connect()
     console.log('Connected successfully to the MongoDB server');
     try{
         const db = client.db(dbName);
         const collection = db.collection('tasks');
     
-        const result = await collection.find({task_name: taskName}).toArray()
+        const result = await collection.find({task_name: taskName, owner: user.username}).toArray()
         console.log("WHAT I SEARCHED FOR",taskName)
         console.log("WHAT I GOT FROM DB", result[0].status)
         const cur_status = result[0].status
@@ -110,23 +112,94 @@ async function updateTaskStatus(taskName){
 
 async function clear(){
     const con = await client.connect()
-    console.log('Connected successfully to the MongoDB server');
-    console.log('getting all')
     try{
         const db = client.db(dbName);
         const collection = db.collection('tasks');
-
+        const collection1 = db.collection('users')
+        const result1 = await collection1.deleteMany();
         const result = await collection.deleteMany();
         
     }catch(e){
         console.log(e)
     } 
 }
+
+//functions for accounts
+
+async function getUser(username){
+    const con = await client.connect()
+    const users_collection_name = 'users'
+    console.log('Connection succesful');
+    return new Promise(async(resolve, reject) => {
+
+        try{
+        const db = client.db(dbName);
+        const collection = db.collection(users_collection_name);
+
+        const query = {username : username}
+
+        const result = await collection.findOne(query)
+        console.log("SENT SUCCES")
+        resolve(result)
+    	}catch(e){
+    		console.log("SENT FAIL")
+        	reject(e)
+    	} 
+
+    })    
+}
+
+async function newUser(user){
+    console.log(user.username)
+    console.log(user.password)
+    const con = await client.connect()
+    return new Promise(async(resolve, reject) => {
+        if(user.username === undefined || user.password === undefined)
+            resolve(false)
+        try{
+            console.log("inserting user into db")
+            const db = client.db(dbName);
+            const collection = db.collection('users');
+            
+            collection.insertOne(user);
+        }catch(e){
+            console.log(e)
+            resolve(false)
+        }
+        resolve(true)
+    })
+    
+}
+
+async function checkUserAvaliable(username){
+    if(username === undefined)
+        return false;
+    const con = await client.connect()
+    return new Promise(async(resolve, reject) => {
+        try{
+            const db = client.db(dbName);
+            const collection = db.collection('users');
+            
+            const checkExists = await collection.findOne({username: username})
+    
+            resolve(checkExists === null)
+            
+        }catch(e){
+            reject(e)
+        }
+        
+    })
+    
+}
+
 module.exports = {
     addTask,
     deleteTask,
     getAllTaskNames,
     getTask,
     updateTaskStatus,
-    clear
+    clear,
+    getUser,
+    newUser,
+    checkUserAvaliable
 };
