@@ -125,17 +125,25 @@ async function clear(){
 
 async function getUser(username){
     const con = await client.connect()
-    try{
+    const users_collection_name = 'users'
+    console.log('Connection succesful');
+    return new Promise(async(resolve, reject) => {
+
+        try{
         const db = client.db(dbName);
-        const collection = db.collection('users');
+        const collection = db.collection(users_collection_name);
 
         const query = {username : username}
 
         const result = await collection.findOne(query)
-        return result
-    }catch(e){
-        console.log(e)
-    }  
+        console.log("SENT SUCCES")
+        resolve(result)
+    	}catch(e){
+    		console.log("SENT FAIL")
+        	reject(e)
+    	} 
+
+    })    
 }
 
 

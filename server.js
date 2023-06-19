@@ -7,16 +7,16 @@ const app = express();
 const port = 3000
 const auth = require('./auth.js')
 
-app.use(bodyParser.urlencoded({ extended: true }));
-app.use(bodyParser.json());
+app.use(express.urlencoded({ extended: true })); // Parse URL-encoded bodies
+app.use(express.json()); // Parse JSON bodies
 app.use(express.static('public'));
-app.use(express.text())
 app.use(session({
   secret: "I love kids",
   resave: false,
   saveUninitialized: false
 }));
-app.use(auth.authenticateUser)
+app.use(auth.authenticateUser);
+
 const dbFunctions =  require('./database.js')
 
 app.get('/login', (req, res) => {
@@ -30,19 +30,35 @@ app.get('/scripts/send_login_info.js', (req, res) => {
 })
 
 app.post('/oJs5Mr1uPxFXVbP2TzWS5SahD', (req, res) =>{
-    const {username, password} = req.body
+    /*
+    problem s redirect sled login
+    da go naprvq vseki task da e binded kym user
+    log out buton
+    create accout buton
+    */
+    const user = req.body
+    console.log(user)
+    const username = user.username
+    const password = user.password
+    console.log("USERNAME, PASSWORD: ", username, password)
     const promise = dbFunctions.getUser(username)
-    promise.then(user => {
-      const result = bcrypt.compare(password, user.password)
-      if(result){
-        req.session.user = user
-        res.redirect('/home')
-      }else{
-        res.send("Shet")
-      }
-    }).catch(err => {
-      console.log(err)
-    })
+    promise.then(_user => {
+    
+      /*bcrypt.compare(password, _user.password, (err, result) =>{
+      	console.log("RECIEVED FROM SERV", _user)
+      	console.log("BCRYPT RESULT: ", result)
+      	if(result && !err){
+      	  req.session.user = _user
+      	  console.log("TAM DET PRIEMA", req.session.user)
+      	  res.send(true)
+     	 }else{
+       	  res.send(false)
+      	}		
+   	 })
+   	 */
+        req.session.user = _user
+        res.send("TWA SE IZPULNI")
+      })
 })
 
 
