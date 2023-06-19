@@ -6,8 +6,11 @@
     <title>Document</title>
     <script src = "./scripts/login/logout.js"></script>
     <script>
-        window.addEventListener('unload', function() {
-            logout()
+        window.addEventListener('beforeunload', function(event) {
+            if(event.unload){
+                logout()
+            }
+            
         });
     </script>
 </head>
